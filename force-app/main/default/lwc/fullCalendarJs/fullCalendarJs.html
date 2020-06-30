@@ -1,0 +1,104 @@
+<!-- 
+@description: Lightning web component using Fullcalendar.io js library to display most recent events
+@author: Brahmaji tammana from www.auraenabled.com 
+@jslibrary: https://fullcalendar.io/ -->
+<template>
+
+    <!-- Spinner to show on waiting screens -->
+    <template if:true={openSpinner}>
+        <lightning-spinner alternative-text="Loading" size="medium"></lightning-spinner>
+    </template>
+
+   <div class="slds-grid slds-wrap slds-theme_default">
+        <div class="slds-col slds-size_3-of-12">
+            <!-- To display list of events or any parent records  
+                TODO: add drag items in this div to drop on fullcalendar.
+            -->
+            <div class=" slds-p-around_medium slds-border_right slds-scrollable_y" style="height:800px">
+                <div class="slds-clearfix">
+                    <div class="slds-float_right">
+                        <lightning-button icon-name="utility:add" slot="actions" 
+                                        alternative-text="add" title="Add" size="small"
+                                        class="slds-p-around_medium"
+                                        label="Add Event"
+                                        onclick={addEvent}>
+                        </lightning-button>
+                    </div>
+                  </div>
+                
+                <template for:each={events} for:item="eachevent">
+                    <lightning-card key={eachevent.id}
+                                    class="slds-p-left_medium slds-p-right_small">
+                        <h3 slot="title">
+                            <span class="slds-p-right_small">
+                                <lightning-icon icon-name="standard:event" size="small">
+
+                                </lightning-icon>
+                            </span>
+                            {eachevent.title} 
+                        </h3>
+                        <lightning-button-icon icon-name="action:remove" slot="actions" 
+                                                alternative-text="remove" title="Remove"
+                                                value={eachevent.id} size="small"
+                                                onclick={removeEvent}>
+
+                        </lightning-button-icon>
+                        
+                        <p class="slds-p-horizontal_small"> Start: <lightning-formatted-date-time value={eachevent.start} year="numeric" month="numeric" day="numeric" hour="2-digit"
+                            minute="2-digit" time-zone="GMT" time-zone-name="short" hour12="true"></lightning-formatted-date-time></p>
+
+                        <p class="slds-p-horizontal_small">End <lightning-formatted-date-time value={eachevent.end} year="numeric" month="numeric" day="numeric" hour="2-digit"
+                            minute="2-digit" time-zone="GMT" time-zone-name="short" hour12="true"></lightning-formatted-date-time></p>
+                        
+                    </lightning-card>
+                </template>
+            </div>
+        </div>
+        <div class="slds-col slds-size_9-of-12">
+                <!-- fullcalendar sits in this div -->
+                <div id="calendar" class="fullcalendarjs"></div>
+        </div>
+   </div>
+
+   <!-- Open a modal with new event form  -->
+   <template if:true={openModal}>
+       <div data-modal="custommodal" class="modalclass">
+            <section
+            role="dialog"
+            tabindex="-1"
+            aria-labelledby="modal-heading-01"
+            aria-modal="true"
+            aria-describedby="modal-content-id-1"
+            class="slds-modal slds-fade-in-open">
+            <div class="slds-modal__container">
+                <header class="slds-modal__header">
+                    <lightning-button-icon icon-name="utility:close" 
+                                            class="slds-modal__close " 
+                                            alternative-text="Close" 
+                                            title="Close"
+                                            size="large"
+                                            variant="bare-inverse"
+                                            onclick={handleCancel} >
+
+                    </lightning-button-icon>
+                    <h2 id="modal-heading-01" class="slds-modal__title slds-hyphenate">New Event</h2>
+                </header>
+                <div class="slds-modal__content slds-p-around_medium"
+                    id="modal-content-id-1">
+                    <lightning-input label="Title" name="title" type="text" required onkeyup={handleKeyup}></lightning-input>
+                    <lightning-input label="Start Date" name="start" type="datetime" required value={startDate}></lightning-input>
+                    <lightning-input label="End Date" name="end" type="datetime" required value={endDate}></lightning-input>
+                </div>
+                <footer class="slds-modal__footer">
+                    <lightning-button-group>
+                        <lightning-button label="Close" title="Close" icon-name="utility:close" onclick={handleCancel}></lightning-button>
+                        <lightning-button label="Save" title="Save" variant="brand" icon-name="utility:save" onclick={handleSave}></lightning-button>
+                    </lightning-button-group>
+                    
+                </footer>
+            </div>
+        </section>
+        <div class="slds-backdrop slds-backdrop_open"></div>
+       </div>
+    </template>
+</template>
